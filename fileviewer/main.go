@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,7 +13,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%+v\n", current_directory)
+	directoryJSON, err := json.Marshal(current_directory)
+	fmt.Println(string(directoryJSON))
 }
 
 type directory struct {
