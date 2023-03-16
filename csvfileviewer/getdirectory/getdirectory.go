@@ -1,7 +1,6 @@
 package getdirectory
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -13,12 +12,12 @@ type directory struct {
 	Sub_Directories []string
 }
 
-func ReadDir(path string) string {
+func ReadDir(path string) (directory, error) {
 	abs, _ := filepath.Abs(path)
 	current_directory := directory{Home: abs, Files: []string{}, Sub_Directories: []string{}}
 	file, err := os.Open(path)
 	if err != nil {
-		return ""
+		return current_directory, err
 	}
 	defer file.Close()
 	names, _ := file.Readdirnames(0)
@@ -26,12 +25,12 @@ func ReadDir(path string) string {
 		filePath := fmt.Sprintf("%v/%v", path, name)
 		file, err := os.Open(filePath)
 		if err != nil {
-			return ""
+			return current_directory, err
 		}
 		defer file.Close()
 		fileInfo, err := file.Stat()
 		if err != nil {
-			return ""
+			return current_directory, err
 		}
 		if fileInfo.IsDir() {
 			current_directory.Sub_Directories = append(current_directory.Sub_Directories, fileInfo.Name())
@@ -39,9 +38,5 @@ func ReadDir(path string) string {
 			current_directory.Files = append(current_directory.Files, fileInfo.Name())
 		}
 	}
-	directoryJSON, err := json.Marshal(current_directory)
-	if err != nil {
-		return ""
-	}
-	return string(directoryJSON)
+	return current_directory, err
 }
