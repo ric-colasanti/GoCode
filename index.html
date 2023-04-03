@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <title>Go how to</title>
+
+</head>
+
+<body>
+  <div class="container">
+    <h3>Go-How-to</h3>
+    <br>
+    <div class="row">
+      <div class="col">
+        <label id="directoryLabel">Directory :</label>
+        <label for="directory">Sub Directories:</label>
+        <select multiple class="form-control" id="directory" name="directory" onclick="selectDirectory()">
+        </select>
+      </div>
+      <div class="col">
+        <label for="sel2">Files</label>
+        <select multiple class="form-control" id="files" name="files" onclick="selectFile()">
+        </select>.
+      </div>
+    </div>
+    <br>
+    <div class="table-responsive-sm" style="overflow-y: auto; height: 350px;">            
+      <table class="table table-bordered table-striped" >
+        <thead class="thead-dark" id="pHeader"></thead>
+        <tbody id="pData"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+
+</html>

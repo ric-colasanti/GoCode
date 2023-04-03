@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSV Viewer</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+</head>
+
+<body>
+  <div class="container">
+    <h3>CSV Viewer</h3>
+    <br>
+    <label id="directoryLable">Directory :</label>
+    <br>
+    <label for="directory">Sub Directories:</label>
+    <select multiple class="form-control" id="directory" name="directory" onclick="selectdirectory()">
+    </select>
+    <br>
+    <label for="sel2">Files</label>
+    <select multiple class="form-control" id="files" name="files" onclick="selectfile()">
+    </select>
+    <br>
+    <div class="table-responsive-sm" style="overflow-y: auto; height: 350px;">            
+      <table class="table table-bordered table-striped" >
+        <thead class="thead-dark" id="pheader"></thead>
+        <tbody id="pdata"></tbody>
+      </table>
+    </div>
+    <svg id="myPlot" style="width:500px;height:500px"></svg>
+
+  </div>
+
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+
+  <script>
+
+
+    var current_directory
+    var output = function (data) {
+      console.log(data);
+    }
+
+    var processDirectory = function (data) {
+      current_directory = data
+      document.getElementById("directoryLable").innerHTML = "Directory: " + current_directory.Home
+      document.getElementById("directory").innerHTML = "<option>..</option>"
+      for (i in current_directory.Sub_Directories) {
+        document.getElementById("directory").innerHTML += "<option>" + current_directory.Sub_Directories[i] + "</option>"
+      }
+
+      document.getElementById("files").innerHTML = ""
+      for (i in current_directory.Files) {
+        if (current_directory.Files[i].endsWith(".csv")) {
+          document.getElementById("files").innerHTML += "<option>" + current_directory.Files[i] + "</option>"
+        }
+      }
+    }
+
+    var viewdata = function (data) {
+      let body = ""
+      let head = "<tr>"
+      for (let key in data[0]) {
+        head += "<th>" + key + "</th>"
+      }
+      head += "</tr>"
+      document.getElementById("pheader").innerHTML = head
+      for (let i = 0; i < data.length; i++) {
+        body += "<tr>"
+        for (let key in data[i]) {
+          body += "<td>" + data[i][key] + "</td>"
+        }
+        body += "</tr>"
+      }
+      document.getElementById("pdata").innerHTML = body
+
+    }
+    var selectdirectory = function () {
+      var x = document.getElementById("directory").value
+      if (x == "..") {
+        let pos = current_directory.Home.lastIndexOf("/")
+        getdirectory(current_directory.Home.slice(0, pos));
+      } else {
+        getdirectory(current_directory.Home + "/" + x)
+      }
+    }
+
+    var selectfile = function () {
+      var x = document.getElementById("files").value
+      getfile(current_directory.Home + "/" + x)
+    }
+
+    var getfile = function (dir) {
+      var url = new URL("http://127.0.0.1:5555/getfile");
+      url.searchParams.append("directory", dir);
+      fetch(url)
+        // Handle success
+        .then((response) => response.json()) // convert to json
+        .then((json) => viewdata(json)) //print data to console
+        .catch((err) => console.log("Request Failed", err)); // Catch errors
+    };
+
+    var getdirectory = function (dir) {
+      var url = new URL("http://127.0.0.1:5555/getdirectory");
+      url.searchParams.append("directory", dir);
+      fetch(url)
+        // Handle success
+        .then((response) => response.json()) // convert to json
+        .then((json) => processDirectory(json)) //print data to console
+        .catch((err) => console.log("Request Failed", err)); // Catch errors
+    };
+    getdirectory("./")
+  </script>
+
+
+<script>
+  // Set Dimensions
+  const xSize = 500; 
+  const ySize = 500;
+  const margin = 40;
+  const xMax = xSize - margin*2;
+  const yMax = ySize - margin*2;
+  
+  // Create Random Points
+  const numPoints = 100;
+  const data = [];
+  for (let i = 0; i < numPoints; i++) {
+    data.push([Math.random() * xMax, Math.random() * yMax]);
+  }
+  
+  // Append SVG Object to the Page
+  const svg = d3.select("#myPlot")
+    .append("svg")
+    .append("g")
+    .attr("transform","translate(" + margin + "," + margin + ")");
+  
+  // X Axis
+  const x = d3.scaleLinear()
+    .domain([0, 500])
+    .range([0, xMax]);
+  
+  svg.append("g")
+    .attr("transform", "translate(0," + yMax + ")")
+    .call(d3.axisBottom(x));
+  
+  // Y Axis
+  const y = d3.scaleLinear()
+    .domain([0, 500])
+    .range([ yMax, 0]);
+  
+  svg.append("g")
+    .call(d3.axisLeft(y));
+  
+  // Dots
+  svg.append('g')
+    .selectAll("dot")
+    .data(data).enter()
+    .append("circle")
+    .attr("cx", function (d) { return d[0] } )
+    .attr("cy", function (d) { return d[1] } )
+    .attr("r", 3)
+    .style("fill", "Red");
+  </script>
+</body>
+
+</html>
