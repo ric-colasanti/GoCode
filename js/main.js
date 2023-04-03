@@ -2,12 +2,19 @@ var mainUrl ="http://127.0.0.1:5555/"
 var currentDirectory
 
 // 
-var viewData = function (data) {
-
+var viewDAta = function(data){
+  console.log(data);
+}
+var viewDataNub = function (data) {
+    document.getElementById("xAxis").innerHTML = "<option> none </option>"
+    document.getElementById("yAxis").innerHTML = "<option> none </option>"
+    
     let body = ""
     let head = "<tr>"
     for (let i=0; i< data.Header.length; i++) {
       head += "<th style='text-align: center'> " + data.Header[i] + "</th>"
+      document.getElementById("xAxis").innerHTML += "<option>" + data.Header[i] + "</option>"
+      document.getElementById("yAxis").innerHTML += "<option>" + data.Header[i] + "</option>"
     }
     head += "</tr>"
     document.getElementById("pHeader").innerHTML = head
@@ -21,7 +28,15 @@ var viewData = function (data) {
     document.getElementById("pData").innerHTML = body
   }
 
-
+var getData = function (){
+  let xAxis = document.getElementById("xAxis")
+  let yAxis = document.getElementById("yAxis")
+  if ((xAxis.value== "none") || (yAxis.value=="none")){
+    console.log("none");
+    return
+  };  
+  console.log(xAxis.value,yAxis.value);
+}
 var processDirectory = function (data) {
     currentDirectory = data
     document.getElementById("directoryLabel").innerHTML = "Directory: " + currentDirectory.Home
@@ -59,7 +74,7 @@ var processDirectory = function (data) {
     fetch(url)
       // Handle success
       .then((response) => response.json()) // convert to json
-      .then((json) => viewData(json)) //print data to console
+      .then((json) => viewDataNub(json)) //print data to console
       .catch((err) => console.log("Request Failed", err)); // Catch errors
   };
 var getDirectory = function (dir) {

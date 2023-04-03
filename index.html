@@ -29,11 +29,23 @@
       </div>
     </div>
     <br>
-    <div class="table-responsive-sm" style="overflow-y: auto; height: 350px;">            
-      <table class="table table-bordered table-striped" >
+    <div class="table-responsive-sm" style="overflow-y: auto; height: 350px;">
+      <table class="table table-bordered table-striped">
         <thead class="thead-dark" id="pHeader"></thead>
         <tbody id="pData"></tbody>
       </table>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col">
+        <label for="sel1">Select data col for x axis:</label>
+        <select class="form-control" id="xAxis" name="xAxis" onchange="getData(this.value);">
+        </select>
+      </div>
+      <div class="col" <label for="sel1">Select data col for y axis:</label>
+        <select class="form-control" id="yAxis" name="yAxis" onchange="getData(this.value);">
+        </select>
+      </div>
     </div>
   </div>
 
